@@ -13,56 +13,41 @@ const PORT = process.env.PORT;
 
 
 
-// http://localhost:3000/weather
+// http://localhost:3000/weather?lat=31.95&lon=35.91&searchQuery=Amman
 
-server.get('/weather',(req,res)=>{
+server.get('/weather',handleWeather);
+server.get('*',(req,res) => res.status(404).send('page not found'));
 
-  let weatherData = weather.find(item =>{
-    // console.log(weather);
-    
-    const lon = req.query.lon;
-    const lat = req.query.lat;
-    const searchQuery = req.query.searchQuery;
-    if (item.city_name == searchQuery || item.lon == lon || item.lat == lat) {
-      console.log(item.city_name);
-      // return `${item.lon} , ${item.lat} , ${item.city_name} , ${item.data[2].weather.description}`;
-      return item.city_name;
-    //   return `${item.lon} , ${item.lat} , ${item.city_name} , ${item.data[2].weather.description} ${item.data[0].datetime,item.data[1].datetime,item.data[2].datetime}`;
-    }else {
-      return 'Error 404 Not Found';
-    }
-  });
-
-
-
-
-  class Forecast {
-    constructor(datetime,description) {
-
-      this.date = datetime;
-      this.description = description;
-    }
+function handleWeather(req , res) {
+  
+  let searchQuery = req.query.searchQuery;
+  const weatherData = weather.find(item =>item.city_name.toLowerCase() === searchQuery.toLowerCase());
+  console.log(searchQuery);
+  if (weatherData != undefined)
+  {
+    const weatherArr = weatherData.data.map(items => new Forecast(items));
+    res.status(200).send(weatherArr);
   }
-  let newArr = [];
-  weatherData.data.map((item) => {
+  else {
+    res.status(500).send('You have error for today');
+
+  }
+  
+}
+function Forecast(items) {
+ 
+    this.dateTime =items.datetime;
+    this.description = items.weather.description;
+}
 
 
-    newArr.push(new Forecast(item.datetime, `Low of ${item.low_temp} , high of ${item.high_temp} , with ${item.weather.description}`));
-  });
-
-  res.send(newArr);
-    //   res.send(weatherData);
 
 
-});
 
-server.listen(PORT,()=>{
+server.listen(PORT,()=>
 
-  console.log(`hello from server this is your port ${PORT}`);
-  //   console.log(weather);
-});
+  console.log(`hello from server this is your port ${PORT}`));
 
-server.get('*', (req,res) => {
-  res.status(404).send('page not found');
-});
+
+
 
