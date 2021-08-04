@@ -1,13 +1,13 @@
 'use strict';
 
+require('dotenv').config();
 const express = require('express');
 const cors = require ('cors');
-const weather = require('./data/weather.json');
 const server = express();
+const axios = require('axios');
+
+
 server.use(cors());
-require('dotenv').config();
-
-
 const PORT = process.env.PORT;
 // const PORT = 3000;
 
@@ -18,9 +18,10 @@ const PORT = process.env.PORT;
 server.get('/weather',handleWeather);
 server.get('*',(req,res) => res.status(404).send('page not found'));
 
-function handleWeather(req , res) {
-
-  let searchQuery = req.query.q;
+async function handleWeather(req , res) {
+  
+  const searchQuery = req.query.q;
+  const URL = `https://api.weatherbit.io/v2.0/forecast/daily?&key=3902269bf7bd418ebca1280b080fb6ef&lat=48.8588897&lon=2.3200410217200766`
   const weatherData = weather.find(item =>item.city_name.toLowerCase() === searchQuery.toLowerCase());
   console.log(searchQuery);
   if (weatherData !== undefined)
@@ -32,12 +33,12 @@ function handleWeather(req , res) {
     res.status(500).send('You have error for today');
 
   }
-
+  
 }
 function Forecast(items) {
-
-  this.dateTime =items.datetime;
-  this.description = items.weather.description;
+ 
+    this.dateTime =items.datetime;
+    this.description = items.weather.description;
 }
 
 
