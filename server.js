@@ -18,12 +18,11 @@ server.get('/weather',handleWeather);
 server.get('/movies',handleMovie);
 
 
-server.get('*',(req,res) => res.status(404).send('page not found'));
 
 
 async function handleMovie(req , res) {
 
-  const searchQuery = req.query.q;
+  const searchQuery = req.query.query;
   // const URLMovie = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${searchQuery}`;
 
   const URLMovie =`https://api.themoviedb.org/3/search/movie?api_key=0233c982f62b7d9615af3d46f9f923cf&query=${searchQuery}`;
@@ -37,26 +36,27 @@ async function handleMovie(req , res) {
       let moviesArr = item.data.results;
       console.log(item.data.results);
       res.send(moviesList(moviesArr));
-        console.log(moviesArr);
-        console.log('hello');
+      console.log(moviesArr);
+      console.log('hello');
     })
 
     .catch (error => {
       res.send(error);
+
     });
 }
 
-const moviesList = (moviesObj) =>{
+const moviesList = (moviesArr) =>{
 
   const moviesObject = [];
 
-  moviesObj.map (item =>{
+  moviesArr.map (item =>{
 
     const title = item.title;
     const overview = item.overview;
     const vote_average = item.vote_average;
     const vote_count = item.vote_count;
-    const poster_path = item.poster_path;
+    const poster_path = process.env.IMG+item.poster_path;
     const popularity = item.popularity;
     const release_data = item.release_data;
 
@@ -64,7 +64,7 @@ const moviesList = (moviesObj) =>{
 
 
   });
-  console.log(moviesObj);
+  console.log(moviesObject);
   return moviesObject;
 };
 
@@ -98,7 +98,7 @@ async function handleWeather(req , res) {
     .then(item =>{
       let weatherArr = item.data.data;
       res.send(weatherList(weatherArr));
-        console.log(weatherArr);
+      console.log(weatherArr);
     })
 
     .catch(error =>{
@@ -170,6 +170,7 @@ class Forecast {
 //   this.description = items.weather.description;
 // }
 
+server.get('*',(req,res) => res.status(404).send('page not found'));
 
 server.listen(PORT,()=>
 
