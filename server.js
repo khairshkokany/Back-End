@@ -15,8 +15,8 @@ const PORT = process.env.PORT;
 const Weather = require('./Weather');
 const Movies = require('./Movies');
 
-server.get('/weather',Weather);
-server.get('/movies',Movies);
+server.get('/movies',Movies.handleMovie);
+server.get('/weather',Weather.handleWeather);
 
 
 
