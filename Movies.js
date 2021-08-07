@@ -3,10 +3,14 @@
 
 const axios = require('axios');
 
+let movies = {};
+
+let memory = {};
+
 
 // const movies = {};
 
-function handleMovie(req , res) {
+movies.handleMovie= async function(req , res) {
 
   const searchQuery = req.query.query;
   // const URLMovie = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${searchQuery}`;
@@ -15,43 +19,54 @@ function handleMovie(req , res) {
 
   // http://api.themoviedb.org/3/search/movie?api_key=4a71d7a66dd2ac2d5c1ce5f254058973&query=amman
 
-  axios
-    .get(URLMovie)
-    .then(item => {
 
-      let moviesArr = item.data.results;
-      console.log(item.data.results);
-      res.send(moviesList(moviesArr));
-      console.log(moviesArr);
-      console.log('hello');
-    })
+  if (memory[searchQuery] !== undefined) {
+    console.log('hello from movies memory ');
+    res.send(memory[searchQuery]);
+  }
+  else
+  {
+    axios
+      .get(URLMovie)
+      .then(item => {
 
-    .catch (error => {
-      res.send(error);
+        let moviesArr = item.data.results;
+        console.log(item.data.results);
+        res.send(movies.moviesList(moviesArr));
+        console.log(moviesArr);
+        console.log('hello');
+      })
 
-    });
-}
+      .catch (error => {
+        res.send(error);
 
-const moviesList = (moviesArr) =>{
-
-  const moviesObject = [];
-
-  moviesArr.map (item =>{
-
-    const title = item.title;
-    const overview = item.overview;
-    const vote_average = item.vote_average;
-    const vote_count = item.vote_count;
-    const poster_path = process.env.IMG+item.poster_path;
-    const popularity = item.popularity;
-    const release_data = item.release_data;
-
-    moviesObject.push(new Movies(title,overview,vote_average,vote_count,poster_path,popularity,release_data));
+      });
 
 
-  });
-  console.log(moviesObject);
-  return moviesObject;
+
+    movies.moviesList = (moviesArr) =>{
+
+      const moviesObject = [];
+
+      moviesArr.map (item =>{
+
+        const title = item.title;
+        const overview = item.overview;
+        const vote_average = item.vote_average;
+        const vote_count = item.vote_count;
+        const poster_path = process.env.IMG+item.poster_path;
+        const popularity = item.popularity;
+        const release_data = item.release_data;
+
+        moviesObject.push(new Movies(title,overview,vote_average,vote_count,poster_path,popularity,release_data));
+
+
+      });
+      console.log(moviesObject);
+      return moviesObject;
+    };
+
+  }
 };
 
 class Movies {
@@ -73,4 +88,4 @@ class Movies {
 
 
 
-module.exports = handleMovie;
+module.exports = movies;
